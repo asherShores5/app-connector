@@ -1,0 +1,68 @@
+/* iOS-style home screen. Light by default, dark follows the system. */
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --bg: #f2f2f7;
+  --text: #1c1c1e;
+  --icon-ring: #0000001a;
+  --icon-bg: #ffffff;
+  --focus: #0a84ff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --text: #f2f2f7;
+    --icon-ring: #ffffff26;
+    --icon-bg: #1c1c1e;
+  }
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+main {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: max(1.25rem, env(safe-area-inset-top)) max(1.25rem, env(safe-area-inset-right)) calc(2rem + env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
+}
+h1 { font-size: 1.75rem; letter-spacing: -0.02em; margin: 0.5rem 0 1.5rem; }
+
+/* Four columns on a phone, like the iOS home screen; more room on wider screens. */
+.tiles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.5rem 0.75rem;
+}
+@media (min-width: 40rem) { .tiles { grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); } }
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 1rem;
+  padding: 0.25rem;
+  -webkit-tap-highlight-color: transparent;
+}
+.tile img {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 22.5%; /* iOS icon corner */
+  box-shadow: 0 0 0 1px var(--icon-ring);
+  object-fit: cover;
+  background: var(--icon-bg);
+  transition: transform 120ms ease;
+}
+.tile:active img { transform: scale(0.92); }
+.tile:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.tile span {
+  font-size: 0.75rem;
+  line-height: 1.2;
+  text-align: center;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
