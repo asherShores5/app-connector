@@ -1,0 +1,10 @@
+node_modules/
+dist/
+cdk.out/
+*.log
+cdk-outputs.json
+.DS_Store
+.scratch/
+e2e/out/
+.vscode/
+.claude/

@@ -1,0 +1,15 @@
+{
+  "name": "apps-e2e",
+  "private": true,
+  "type": "module",
+  "description": "Playwright screenshots of the built web app. Not a workspace: CI never installs it.",
+  "scripts": {
+    "preview": "tsx preview.ts",
+    "offline": "tsx offline.ts",
+    "icons": "tsx icons.ts"
+  },
+  "devDependencies": {
+    "playwright": "1.64.1",
+    "tsx": "^4.19.0"
+  }
+}

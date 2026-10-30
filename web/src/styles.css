@@ -1,0 +1,144 @@
+/* iOS-style home screen. Light by default, dark follows the system. */
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --bg: #f2f2f7;
+  --text: #1c1c1e;
+  --icon-ring: #0000001a;
+  --icon-bg: #ffffff;
+  --focus: #0a84ff;
+  --info-bg: #ffffff;
+  --info-text: #3a3a3c;
+  --sheet-bg: #ffffff;
+  --button-bg: #f2f2f7;
+  --link: #007aff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --text: #f2f2f7;
+    --icon-ring: #ffffff26;
+    --icon-bg: #1c1c1e;
+    --info-bg: #3a3a3c;
+    --info-text: #f2f2f7;
+    --sheet-bg: #1c1c1e;
+    --button-bg: #2c2c2e;
+    --link: #0a84ff;
+  }
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+main {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: max(1.25rem, env(safe-area-inset-top)) max(1.25rem, env(safe-area-inset-right)) calc(2rem + env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
+}
+h1 { font-size: 1.75rem; letter-spacing: -0.02em; margin: 0.5rem 0 1.5rem; }
+
+/* Four columns on a phone, like the iOS home screen; more room on wider screens. */
+.tiles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.5rem 0.75rem;
+}
+@media (min-width: 40rem) { .tiles { grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); } }
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 1rem;
+  padding: 0.25rem;
+  -webkit-tap-highlight-color: transparent;
+}
+.tile img {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 22.5%; /* iOS icon corner */
+  box-shadow: 0 0 0 1px var(--icon-ring);
+  object-fit: cover;
+  background: var(--icon-bg);
+  transition: transform 120ms ease;
+}
+.tile:active img { transform: scale(0.92); }
+.tile:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.tile span {
+  font-size: 0.75rem;
+  line-height: 1.2;
+  text-align: center;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+/* The (i) button sits on the icon's top-right corner, outside the Tile link, so a tap on it
+   never opens the App. Small to look at; the ::before pad gives it a ~40px tap target. */
+.tiles li { position: relative; }
+.info {
+  position: absolute;
+  top: -0.2rem;
+  right: calc(50% - 2.45rem);
+  width: 1.4rem;
+  height: 1.4rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--info-bg);
+  color: var(--info-text);
+  box-shadow: 0 0 0 1px var(--icon-ring), 0 1px 3px #00000033;
+  font: italic 700 0.8rem/1 Georgia, "Times New Roman", serif;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.info::before { content: ""; position: absolute; inset: -0.55rem; }
+.info:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* Install hint: a bottom sheet on a phone, a centred card on wider screens. */
+.hint {
+  border: 0;
+  padding: 0;
+  margin: auto auto 0;
+  width: 100%;
+  max-width: 100%;
+  border-radius: 1rem 1rem 0 0;
+  background: var(--sheet-bg);
+  color: var(--text);
+  box-shadow: 0 -4px 24px #00000040;
+}
+.hint::backdrop { background: #00000066; }
+.hint-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.5rem max(1.25rem, env(safe-area-inset-right)) calc(1.25rem + env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
+}
+.hint-body img { width: 3.5rem; height: 3.5rem; border-radius: 22.5%; box-shadow: 0 0 0 1px var(--icon-ring); background: var(--icon-bg); }
+.hint h2 { font-size: 1.25rem; margin: 0.6rem 0 0.2rem; }
+.hint-url { color: var(--link); font-size: 0.85rem; overflow-wrap: anywhere; }
+.hint p { margin: 1rem 0 0.4rem; font-size: 0.95rem; }
+.hint ol { margin: 0; padding-left: 1.4rem; text-align: left; line-height: 1.45; font-size: 0.95rem; align-self: stretch; }
+.hint ol li { margin: 0.3rem 0; }
+.hint-close {
+  margin-top: 1.25rem;
+  align-self: stretch;
+  min-height: 2.75rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background: var(--button-bg);
+  color: var(--link);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.hint-close:focus-visible, .hint-url:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+@media (min-width: 40rem) {
+  .hint { margin: auto; max-width: 24rem; border-radius: 1rem; box-shadow: 0 8px 40px #00000040; }
+  .hint-body { padding: 1.5rem; }
+}

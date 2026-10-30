@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#1e2230"/>
+  <!-- 2x2 grid of app squares; the PNG icons are rendered from this file (e2e/icons.ts) -->
+  <rect x="88" y="88" width="150" height="150" rx="36" fill="#f6b73c"/>
+  <rect x="274" y="88" width="150" height="150" rx="36" fill="#4cc38a"/>
+  <rect x="88" y="274" width="150" height="150" rx="36" fill="#5b8def"/>
+  <rect x="274" y="274" width="150" height="150" rx="36" fill="#a78bfa"/>
+</svg>
