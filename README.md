@@ -32,6 +32,10 @@ npm run build:web
 cd e2e && npm install && npm run preview   # writes e2e/out/preview-*.png
 ```
 
+Offline and update check (real service worker on a local 127.0.0.1 server with the CloudFront
+CSP): `cd e2e && npm run offline`. App Connector's own icon is `web/public/icon.svg`; after
+editing it, `cd e2e && npm run icons` re-renders `icon-180/192/512.png`.
+
 ## Adding an App
 
 Copy its icon (a square PNG, 192px is plenty) into `web/public/icons/`, add an entry to
