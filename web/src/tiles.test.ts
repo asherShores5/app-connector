@@ -13,7 +13,7 @@ describe("Tiles", () => {
       { name: "HoneyDo", url: "https://honeydo.ashershores.com" },
       { name: "NutriSageAI", url: "https://ashershores5.github.io/NutriSageAI/docs/" },
       { name: "Games Catalog", url: "https://games.ashershores.com" },
-      { name: "Exam Prep Lab", url: "https://exampreplab.com" },
+      { name: "Exam Prep Lab", url: "https://exampreplab.ashershores.com/" },
     ]);
   });
 
