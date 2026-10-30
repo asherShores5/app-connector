@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "synth": "cdk synth --quiet",
+    "deploy": "cdk deploy --all --require-approval never -c requireHosting=true",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
