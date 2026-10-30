@@ -7,3 +7,4 @@ cdk-outputs.json
 .scratch/
 e2e/out/
 .vscode/
+.claude/
