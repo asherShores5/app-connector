@@ -36,7 +36,9 @@ export function InstallHint({ tile, onClose }: { tile: Tile; onClose: () => void
         </a>
         <p>To add it to your home screen as its own app:</p>
         <ol>
-          <li>Open {tile.name} in Safari (tap the address above).</li>
+          <li>
+            Tap the address above. If it opens inside Apps, tap the compass button to open it in Safari.
+          </li>
           <li>Tap <strong>Share</strong> (the square with an arrow pointing up).</li>
           <li>Scroll down and tap <strong>Add to Home Screen</strong>, then <strong>Add</strong>.</li>
         </ol>

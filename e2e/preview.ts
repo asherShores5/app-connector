@@ -8,6 +8,7 @@ import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium, devices, type BrowserContextOptions, type Locator, type Page } from "playwright";
+import { TILES } from "../web/src/tiles";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.resolve(HERE, "..", "web", "dist");
@@ -27,7 +28,7 @@ async function shoot(context: BrowserContextOptions, label: string) {
     const url = new URL(route.request().url());
     if (url.origin !== ORIGIN) return route.abort();
     let file = path.join(DIST, decodeURIComponent(url.pathname));
-    if (!file.startsWith(DIST) || !existsSync(file) || url.pathname === "/") file = path.join(DIST, "index.html");
+    if (!file.startsWith(DIST + path.sep) || !existsSync(file) || url.pathname === "/") file = path.join(DIST, "index.html");
     return route.fulfill({ body: readFileSync(file), contentType: TYPES[path.extname(file)] ?? "application/octet-stream" });
   });
   const page = await ctx.newPage();
@@ -36,7 +37,7 @@ async function shoot(context: BrowserContextOptions, label: string) {
   await page.locator("a.tile").first().waitFor();
 
   const names = await page.locator("a.tile span").allTextContents();
-  if (names.join("|") !== "HoneyDo|NutriSageAI|Games Catalog|Exam Prep Lab") problems.push(`${label}: Tiles ${names.join(", ")}`);
+  if (names.join("|") !== TILES.map((t) => t.name).join("|")) problems.push(`${label}: Tiles ${names.join(", ")}`);
   for (const a of await page.locator("a.tile").all()) {
     if ((await a.getAttribute("target")) !== "_blank") problems.push(`${label}: ${await a.textContent()} not a new tab`);
   }
@@ -65,15 +66,15 @@ async function checkInstallHint(page: Page, label: string, phone: boolean) {
   const settle = () => page.waitForTimeout(150);
 
   const infos = page.locator("button.info");
-  if ((await infos.count()) !== 4) fail(`buttons ${await infos.count()}`);
+  if ((await infos.count()) !== TILES.length) fail(`buttons ${await infos.count()}`);
 
-  // (i) on NutriSageAI opens its sheet, not the App.
+  // (i) on the second Tile opens its sheet, not the App.
   await tap(infos.nth(1));
   await settle();
   if (!(await sheet.isVisible())) return fail("did not open");
   if (popups.length) fail(`(i) also opened ${popups.join(", ")}`);
-  if ((await sheet.locator("h2").textContent()) !== "NutriSageAI") fail(`title ${await sheet.locator("h2").textContent()}`);
-  if (!(await sheet.textContent())?.includes("https://ashershores5.github.io/NutriSageAI/docs/")) fail("no address");
+  if ((await sheet.locator("h2").textContent()) !== TILES[1].name) fail(`title ${await sheet.locator("h2").textContent()}`);
+  if (!(await sheet.textContent())?.includes(TILES[1].url)) fail("no address");
   if (!(await sheet.evaluate((d) => d.contains(document.activeElement)))) fail("focus not in sheet");
   if (phone) await page.screenshot({ path: path.join(OUT, `preview-${label}-hint.png`) });
 
@@ -87,7 +88,7 @@ async function checkInstallHint(page: Page, label: string, phone: boolean) {
   await infos.nth(2).focus();
   await page.keyboard.press("Enter");
   await settle();
-  if ((await sheet.locator("h2").textContent()) !== "Games Catalog") fail("Enter on (i) did not open Games Catalog");
+  if ((await sheet.locator("h2").textContent()) !== TILES[2].name) fail(`Enter on (i) did not open ${TILES[2].name}`);
   await tap(sheet.getByRole("button", { name: "Close" }));
   await settle();
   if (await sheet.count()) fail("still open after Close");
@@ -115,7 +116,7 @@ async function checkInstallHint(page: Page, label: string, phone: boolean) {
   // The Tile itself still opens its App.
   await tap(page.locator("a.tile").nth(3));
   await settle();
-  if (!popups.some((u) => u.startsWith("https://exampreplab.com"))) fail(`Tile tap opened ${popups.join(", ") || "nothing"}`);
+  if (!popups.some((u) => u.startsWith(TILES[3].url))) fail(`Tile tap opened ${popups.join(", ") || "nothing"}`);
   if (await sheet.count()) fail("Tile tap opened the sheet");
 }
 

@@ -42,14 +42,19 @@ self.addEventListener("fetch", (event) => {
 /** Network first so a new deploy shows up on the next launch; the cached index.html when offline or slow. */
 async function shell(request: Request): Promise<Response> {
   const cached = () => caches.open(CACHE).then((c) => c.match("/index.html"));
+  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     const fresh = await Promise.race([
       fetch(request),
-      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), NAV_TIMEOUT_MS)),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("timeout")), NAV_TIMEOUT_MS);
+      }),
     ]);
+    clearTimeout(timer);
     if (fresh.ok) return fresh;
     return (await cached()) ?? fresh;
   } catch (e) {
+    clearTimeout(timer);
     const hit = await cached();
     if (hit) return hit;
     throw e;

@@ -2,7 +2,7 @@
 //   npm run build:web (repo root), then: cd e2e && npm install && npm run offline
 // Serves dist from a throwaway HTTP server on 127.0.0.1 (a secure context, so the worker really
 // registers) with the same CSP as CloudFront, and checks:
-//   1. after one online load, an offline reload still shows all four Tiles and their icons;
+//   1. after one online load, an offline reload still shows every Tile and its icon;
 //   2. a new build replaces the cached shell on the next launch (no stale shell forever).
 // "Offline" is both the browser's offline flag and the server dropping every connection.
 import { existsSync, readFileSync } from "node:fs";
@@ -11,20 +11,17 @@ import type { AddressInfo } from "node:net";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium, devices, type BrowserContext, type Page } from "playwright";
+// The policy CloudFront sends, so a CSP the worker breaks fails here too.
+import { CONTENT_SECURITY_POLICY as CSP } from "../infra/lib/csp";
+import { TILES as TILE_LIST } from "../web/src/tiles";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.resolve(HERE, "..", "web", "dist");
-const TILES = "HoneyDo|NutriSageAI|Games Catalog|Exam Prep Lab";
+const TILES = TILE_LIST.map((t) => t.name).join("|");
 const TYPES: Record<string, string> = {
   ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json",
   ".svg": "image/svg+xml", ".png": "image/png", ".webmanifest": "application/manifest+json",
 };
-// Same policy as infra/lib/hosting.ts, so a CSP the worker breaks fails here too.
-const CSP = [
-  "default-src 'self'", "script-src 'self'", "style-src 'self'", "img-src 'self'", "connect-src 'self'",
-  "manifest-src 'self'", "worker-src 'self'", "frame-src 'none'", "object-src 'none'",
-  "frame-ancestors 'none'", "base-uri 'self'",
-].join("; ");
 
 if (!existsSync(path.join(DIST, "index.html"))) {
   console.error("No web/dist: run `npm run build:web` from the repo root first.");
@@ -39,7 +36,7 @@ const server = createServer((req, res: ServerResponse) => {
   if (down) return req.socket.destroy();
   const pathname = decodeURIComponent(new URL(req.url ?? "/", "http://x").pathname);
   let file = path.join(DIST, pathname);
-  if (!file.startsWith(DIST) || !existsSync(file) || pathname === "/") file = path.join(DIST, "index.html");
+  if (!file.startsWith(DIST + path.sep) || !existsSync(file) || pathname === "/") file = path.join(DIST, "index.html");
   let body = readFileSync(file);
   if (nextBuild) body = nextBuild(path.relative(DIST, file), body);
   res.writeHead(200, {
@@ -60,7 +57,7 @@ async function setOffline(ctx: BrowserContext, offline: boolean) {
   await ctx.setOffline(offline);
 }
 
-/** All four Tiles, in order, with every icon decoded. */
+/** Every Tile, in order, with every icon decoded. */
 async function tilesShown(page: Page, label: string) {
   await page.locator("a.tile").first().waitFor({ timeout: 5000 });
   const names = (await page.locator("a.tile span").allTextContents()).join("|");
@@ -70,7 +67,7 @@ async function tilesShown(page: Page, label: string) {
     (imgs as HTMLImageElement[]).filter((i) => i.naturalWidth === 0).map((i) => i.src));
   if (broken.length) problems.push(`${label}: icons not loaded ${broken.join(", ")}`);
   const count = await page.locator("a.tile img").count();
-  if (count !== 4) problems.push(`${label}: ${count} icons`);
+  if (count !== TILE_LIST.length) problems.push(`${label}: ${count} icons`);
 }
 
 /** Opens App Connector like a launch from the home screen and waits for the worker to control it. */
@@ -107,7 +104,7 @@ try {
   const [cacheA] = await shellCaches(first);
   if (!cacheA) throw new Error("online: no shell cache after first load");
   const precached = await first.evaluate(async (name) => (await (await caches.open(name)).keys()).map((r) => new URL(r.url).pathname), cacheA ?? "");
-  for (const p of ["/index.html", "/manifest.webmanifest", "/icon-180.png", "/icons/honeydo.png", "/icons/nutrisageai.png", "/icons/games-catalog.png", "/icons/exam-prep-lab.png"]) {
+  for (const p of ["/index.html", "/manifest.webmanifest", "/icon-180.png", ...TILE_LIST.map((t) => t.icon)]) {
     if (!precached.includes(p)) problems.push(`online: ${p} not precached`);
   }
 
@@ -118,7 +115,7 @@ try {
   const cold = await launch(ctx, "offline launch");
   await tilesShown(cold, "offline launch");
   await cold.close();
-  results.push(`offline: reload and cold launch show all 4 Tiles and icons (${precached.length} files precached)`);
+  results.push(`offline: reload and cold launch show all ${TILE_LIST.length} Tiles and icons (${precached.length} files precached)`);
 
   // 2. Next deploy: index.html and the worker's baked-in build version both change.
   await setOffline(ctx, false);
