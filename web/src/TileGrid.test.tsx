@@ -35,4 +35,14 @@ describe("TileGrid", () => {
   it("never frames or embeds an App", () => {
     expect(renderToStaticMarkup(<TileGrid tiles={tiles} />)).not.toMatch(/<(iframe|frame|embed|object)\b/);
   });
+
+  it("gives every Tile an (i) button, outside its link, that names the App", () => {
+    const html = renderToStaticMarkup(<TileGrid tiles={tiles} />);
+    for (const l of links(html)) expect(l.body).not.toMatch(/<button\b/);
+    const buttons = [...html.matchAll(/<button\b([^>]*)>/g)].map(([, a]) => a);
+    expect(buttons).toHaveLength(2);
+    expect(buttons[0]).toMatch(/type="button"/);
+    expect(buttons[0]).toMatch(/aria-label="How to install First App"/);
+    expect(buttons[1]).toMatch(/aria-label="How to install Second &amp; Co"/);
+  });
 });
