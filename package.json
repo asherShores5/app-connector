@@ -1,0 +1,11 @@
+{
+  "name": "app-connector",
+  "private": true,
+  "workspaces": ["infra", "web"],
+  "scripts": {
+    "test": "npm test -w web -w infra",
+    "typecheck": "npm run typecheck -w web -w infra",
+    "build:web": "npm run build -w web",
+    "synth": "npm run build:web && npm run synth -w infra"
+  }
+}
