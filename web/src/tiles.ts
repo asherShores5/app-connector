@@ -1,6 +1,8 @@
 /**
- * The Tiles, in grid order (HoneyDo top left). To add an App: copy its icon into
- * web/public/icons/ and add an entry here. Icons are committed copies, never live links.
+ * The Tiles, in grid order (HoneyDo top left). Icons are committed copies, never live links.
+ * Adding an App means: an entry here, its icon file in web/public/icons/, and updating the pinned
+ * list in tiles.test.ts (it pins the spec's order and addresses on purpose). The e2e checks read
+ * names and icons from here.
  */
 export interface Tile {
   name: string;

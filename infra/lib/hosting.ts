@@ -11,6 +11,7 @@ import {
 } from "aws-cdk-lib";
 import type { Construct } from "constructs";
 import type { HostingConfig } from "./config";
+import { CONTENT_SECURITY_POLICY } from "./csp";
 
 /** The address App Connector is served at. */
 export const APP_DOMAIN = "apps.ashershores.com";
@@ -70,20 +71,7 @@ export class WebStack extends Stack {
       securityHeadersBehavior: {
         contentSecurityPolicy: {
           override: true,
-          // Everything (shell, Tile icons) is served from this origin; Apps are opened, never framed.
-          contentSecurityPolicy: [
-            "default-src 'self'",
-            "script-src 'self'",
-            "style-src 'self'",
-            "img-src 'self'",
-            "connect-src 'self'",
-            "manifest-src 'self'",
-            "worker-src 'self'",
-            "frame-src 'none'",
-            "object-src 'none'",
-            "frame-ancestors 'none'",
-            "base-uri 'self'",
-          ].join("; "),
+          contentSecurityPolicy: CONTENT_SECURITY_POLICY,
         },
         strictTransportSecurity: { override: true, accessControlMaxAge: Duration.days(365), includeSubdomains: false },
         contentTypeOptions: { override: true },
@@ -99,6 +87,7 @@ export class WebStack extends Stack {
         responseHeadersPolicy: headers,
       },
       defaultRootObject: "index.html",
+      // Deliberately no 403/404 -> index.html error response: one page, no client-side routes.
       ...(props.live && { domainNames: [props.live.domain], certificate: props.live.certificate }),
       priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
     });
@@ -106,7 +95,8 @@ export class WebStack extends Stack {
     new s3deploy.BucketDeployment(this, "Deploy", {
       destinationBucket: bucket,
       sources: [s3deploy.Source.asset(props.webDist)],
-      // Vite assets are content-hashed; no-cache just forces cheap revalidation of index.html.
+      // Every object, hashed bundle included, gets no-cache: browsers revalidate each fetch (a cheap
+      // 304 when unchanged). Offline launches come from the service worker, not the HTTP cache.
       cacheControl: [s3deploy.CacheControl.noCache()],
       distribution,
       distributionPaths: ["/*"],
