@@ -8,10 +8,7 @@ export const DEPLOY_BRANCH = "prod";
 export const DEPLOY_ROLE_NAME = "app-connector-github-deploy";
 
 interface CiStackProps extends StackProps {
-  /**
-   * Numeric repo ID (`gh api repos/asherShores5/app-connector --jq .id`). When set, only the
-   * ID-form subject is trusted, so a renamed or re-created repo with the same name can't deploy.
-   */
+  /** Numeric repo ID (`gh api repos/asherShores5/app-connector --jq .id`); adds the ID-form subject. */
   githubRepoId?: string;
 }
 
@@ -37,7 +34,7 @@ export class CiStack extends Stack {
       `arn:aws:iam::${this.account}:oidc-provider/token.actions.githubusercontent.com`,
     );
     const [owner, repo] = GITHUB_REPO.split("/");
-    const subjectRepo = githubRepoId ? `${owner}@${GITHUB_OWNER_ID}/${repo}@${githubRepoId}` : GITHUB_REPO;
+    const repos = [GITHUB_REPO, ...(githubRepoId ? [`${owner}@${GITHUB_OWNER_ID}/${repo}@${githubRepoId}`] : [])];
 
     const role = new iam.Role(this, "DeployRole", {
       roleName: DEPLOY_ROLE_NAME,
@@ -45,7 +42,7 @@ export class CiStack extends Stack {
       assumedBy: new iam.WebIdentityPrincipal(provider.openIdConnectProviderArn, {
         StringEquals: {
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-          "token.actions.githubusercontent.com:sub": [`repo:${subjectRepo}:ref:refs/heads/${DEPLOY_BRANCH}`],
+          "token.actions.githubusercontent.com:sub": repos.map((r) => `repo:${r}:ref:refs/heads/${DEPLOY_BRANCH}`),
         },
       }),
     });
