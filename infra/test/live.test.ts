@@ -116,11 +116,11 @@ describe("deploy CI (GitHub OIDC)", () => {
     ci.hasResourceProperties("AWS::IAM::Role", { RoleName: "app-connector-github-deploy" });
   });
 
-  it("adds the immutable-ID subject form when the repo ID is given, still prod only", () => {
+  it("trusts only the immutable-ID subject form when the repo ID is given, still prod only", () => {
     const stack = new CiStack(new App(), "Ci", { env: { account: HOSTING.account, region: "us-west-1" }, githubRepoId: "987654321" });
     const [s] = Object.values(Template.fromStack(stack).findResources("AWS::IAM::Role"))[0].Properties.AssumeRolePolicyDocument.Statement;
+    // Not the name form too: a renamed or re-created repo with the same name must not get in.
     expect(s.Condition.StringEquals["token.actions.githubusercontent.com:sub"]).toEqual([
-      "repo:asherShores5/app-connector:ref:refs/heads/prod",
       "repo:asherShores5@71547146/app-connector@987654321:ref:refs/heads/prod",
     ]);
   });
