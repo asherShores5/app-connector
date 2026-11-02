@@ -5,7 +5,7 @@
 **App**: One of Asher's separately hosted web apps (HoneyDo, Games Catalog, Exam Prep Lab,
 NutriSageAI). App Connector links to Apps; it does not contain or embed them.
 
-**Tile**: An App's entry in App Connector: icon, name, link, and an install hint.
+**Tile**: An App's entry in App Connector: icon, name and link.
 
-**Install hint**: Short instructions on a Tile for adding that App to the home screen, so it opens
-as its own installed app instead of a Safari page.
+**Home link**: The button at the top of App Connector that opens my home site, ashershores.com.
+It is not a Tile.
