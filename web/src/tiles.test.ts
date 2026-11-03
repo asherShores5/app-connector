@@ -11,7 +11,7 @@ describe("Tiles", () => {
   it("lists the four Apps in spec order, HoneyDo first", () => {
     expect(TILES.map(({ name, url }) => ({ name, url }))).toEqual([
       { name: "HoneyDo", url: "https://honeydo.ashershores.com" },
-      { name: "NutriSageAI", url: "https://ashershores5.github.io/NutriSageAI/docs/" },
+      { name: "NutriSage", url: "https://nutrisage.ashershores.com" },
       { name: "Games Catalog", url: "https://games.ashershores.com" },
       { name: "Exam Prep Lab", url: "https://exampreplab.ashershores.com/" },
     ]);
