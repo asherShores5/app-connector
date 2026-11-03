@@ -14,7 +14,7 @@ export interface Tile {
 
 export const TILES: readonly Tile[] = [
   { name: "HoneyDo", url: "https://honeydo.ashershores.com", icon: "/icons/honeydo.png" },
-  { name: "NutriSageAI", url: "https://ashershores5.github.io/NutriSageAI/docs/", icon: "/icons/nutrisageai.png" },
+  { name: "NutriSage", url: "https://nutrisage.ashershores.com", icon: "/icons/nutrisage.png" },
   { name: "Games Catalog", url: "https://games.ashershores.com", icon: "/icons/games-catalog.png" },
   { name: "Exam Prep Lab", url: "https://exampreplab.ashershores.com/", icon: "/icons/exam-prep-lab.png" },
 ];
