@@ -14,6 +14,7 @@ describe("Tiles", () => {
       { name: "NutriSage", url: "https://nutrisage.ashershores.com" },
       { name: "Games Catalog", url: "https://games.ashershores.com" },
       { name: "Exam Prep Lab", url: "https://exampreplab.ashershores.com/" },
+      { name: "Throne", url: "https://throne.ashershores.com" },
     ]);
   });
 

@@ -17,4 +17,5 @@ export const TILES: readonly Tile[] = [
   { name: "NutriSage", url: "https://nutrisage.ashershores.com", icon: "/icons/nutrisage.png" },
   { name: "Games Catalog", url: "https://games.ashershores.com", icon: "/icons/games-catalog.png" },
   { name: "Exam Prep Lab", url: "https://exampreplab.ashershores.com/", icon: "/icons/exam-prep-lab.png" },
+  { name: "Throne", url: "https://throne.ashershores.com", icon: "/icons/throne.png" },
 ];
